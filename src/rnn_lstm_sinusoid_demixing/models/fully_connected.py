@@ -23,6 +23,9 @@ class FullyConnectedModel(nn.Module):
         hidden_size: int = 64,
     ) -> None:
         super().__init__()
+        self.window_size = window_size
+        self.num_components = num_components
+        self.hidden_size = hidden_size
         input_size = window_size + num_components
         self.net = nn.Sequential(
             nn.Linear(input_size, hidden_size),
@@ -30,6 +33,13 @@ class FullyConnectedModel(nn.Module):
             nn.Linear(hidden_size, hidden_size),
             nn.ReLU(),
             nn.Linear(hidden_size, window_size),
+        )
+
+    def __repr__(self) -> str:
+        return (
+            f"FullyConnectedModel(window_size={self.window_size}, "
+            f"num_components={self.num_components}, "
+            f"hidden_size={self.hidden_size})"
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

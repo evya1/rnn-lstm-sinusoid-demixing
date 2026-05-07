@@ -75,6 +75,26 @@ The documentation files were populated with initial meaningful content before co
 **Outcome:** Full project skeleton created. All subpackages import cleanly. Config dataclasses validate inputs. Path helpers resolve correctly. No ML logic implemented yet.
 **Human Review:** Student should verify `uv run pytest tests/unit -v` and `uv run ruff check .` pass before committing.
 
+## Prompt 9 — Phase 6: Models
+
+**Date:** 2026-05-07
+**Tool/Agent:** Claude Code
+**Purpose:** Complete Phase 06 — verify and extend the three model implementations, add __repr__ for logging, write per-model forward-pass test files, and update CLAUDE.md with commit discipline and PR standards.
+**Prompt Summary:** Asked Claude to checkout and rebase phase-06/models, update CLAUDE.md with granular commit and professional PR rules, flesh out PRD_model_comparison.md, add __repr__ + stored hyperparams to all three models, and write one test file per model.
+**Files Affected:**
+- `CLAUDE.md` — new sections 19 (Commit Discipline) and 20 (Pull Request Standards)
+- `docs/PRD_model_comparison.md` — fleshed out with architecture tables, input prep notes, fairness rules, and acceptance tests
+- `src/rnn_lstm_sinusoid_demixing/models/fully_connected.py` — stored hyperparams, added __repr__
+- `src/rnn_lstm_sinusoid_demixing/models/rnn_model.py` — stored hyperparams, added __repr__
+- `src/rnn_lstm_sinusoid_demixing/models/lstm_model.py` — stored hyperparams, added __repr__
+- `tests/unit/test_fc_model.py` — 8 forward-pass tests for FullyConnectedModel
+- `tests/unit/test_rnn_model.py` — 8 forward-pass tests for RNNModel
+- `tests/unit/test_lstm_model.py` — 8 forward-pass tests for LSTMModel
+- `docs/TODO.md` — Phase 6 items marked complete
+- `docs/PROMPTS.md` — this entry
+**Outcome:** 129 unit tests pass (85 from prior phases + 44 new). Ruff clean. All three models verified for correct output shape, finite values, stored hyperparams, __repr__, input preparation, and factory wiring.
+**Human Review:** Student should verify `uv run pytest tests/unit -v` and `uv run ruff check .` pass before PR.
+
 ## Prompt 8 — Phase 5: Dataset Builder
 
 **Date:** 2026-05-07

@@ -577,3 +577,42 @@ Follow idiomatic, readable Python. Prefer simple, explicit, maintainable code ov
 - Keep SDK/facade classes thin; they should orchestrate existing modules, not hide large amounts of logic.
 - For custom classes that are not dataclasses, implement `__repr__` when it helps debugging or logging.
 - Do not implement special methods merely to look “Pythonic”; use them only when they make the object behave naturally with Python syntax.
+
+## 19. Commit Discipline
+
+Every commit on a phase branch must follow these rules:
+
+- **One logical change per commit.** Do not bundle unrelated changes (e.g., a new module + its tests + a docs update) into one commit.
+- **Size constraint:** Aim for ≤ 100 lines changed and ≤ 2 files per commit where possible. If a single logical change unavoidably touches more, that is acceptable, but it must never be used as a shortcut to batch unrelated work.
+- **Suggested sequence within a phase:**
+  1. PRD / sub-PRD documentation update — docs files only.
+  2. Source implementation — one module at a time, one commit per file where practical.
+  3. Tests for that module — one test file per commit.
+  4. TODO + PROMPTS update — docs files only, as the final commit.
+- **Never squash all phase work into one commit.** The course grades on a visible, incremental development history. A clean `git log` is part of the submission.
+- Commit messages must use the imperative mood, briefly state *what* changed and *why* (if non-obvious), and end with the co-author trailer.
+
+## 20. Pull Request Standards
+
+PR bodies must be professional, specific, and traceable. Every PR must include:
+
+### Required sections
+
+1. **Overview** — one paragraph summarising the phase goal and scope boundaries (what is *not* included).
+2. **TODOs resolved** — quote the exact checkbox lines from `docs/TODO.md` that this PR closes, rendered as a checked list.
+3. **Plan / PRD reference** — cite the governing section of `docs/PLAN.md` or the relevant sub-PRD (e.g., `docs/PRD_model_comparison.md §Models`).
+4. **Commit log** — list each commit by short hash and one-line description, e.g.:
+   ```
+   abc1234  Add __repr__ to FullyConnectedModel
+   def5678  Implement forward-pass tests for FC model
+   ```
+5. **Files changed** — for every file, state what changed and the key design decision behind it.
+6. **Design decisions** — explain non-obvious implementation choices: why a particular API shape, data layout, or algorithm was chosen.
+7. **Validation** — show the exact commands run and their results:
+   ```
+   uv run pytest tests/unit -v  →  N passed
+   uv run ruff check .          →  All checks passed
+   ```
+
+The PR title must follow the pattern `Phase NN: <short noun phrase>`.
+Do not write vague PR bodies (“added models”, “fixed stuff”). Cite filenames, line counts, commit hashes, and section references.
