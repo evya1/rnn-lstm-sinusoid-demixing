@@ -65,6 +65,8 @@ Planned PR: TBD
 - [x] Implement RNN model.
 - [x] Implement LSTM model.
 - [x] Add forward-pass tests for all models.
+- [x] Add input preparation utilities (`models/input_prep.py`).
+- [x] Add model factory (`models/factory.py`).
 
 ## Phase 7 — Training and Evaluation
 

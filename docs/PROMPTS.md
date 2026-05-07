@@ -92,7 +92,7 @@ The documentation files were populated with initial meaningful content before co
 - `tests/unit/test_lstm_model.py` — 8 forward-pass tests for LSTMModel
 - `docs/TODO.md` — Phase 6 items marked complete
 - `docs/PROMPTS.md` — this entry
-**Outcome:** 109 unit tests pass (85 from prior phases + 24 new). Ruff clean. All three models verified for correct output shape, finite values, stored hyperparams, and __repr__.
+**Outcome:** 129 unit tests pass (85 from prior phases + 44 new). Ruff clean. All three models verified for correct output shape, finite values, stored hyperparams, __repr__, input preparation, and factory wiring.
 **Human Review:** Student should verify `uv run pytest tests/unit -v` and `uv run ruff check .` pass before PR.
 
 ## Prompt 8 — Phase 5: Dataset Builder
