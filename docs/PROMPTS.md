@@ -156,3 +156,25 @@ The project will continue with short-lived phase branches and pull requests. Eac
 - `docs/TODO.md` — Phase 7 items marked complete
 **Outcome:** 170 tests pass; ruff clean. Trainer verified on all three model types (fc, rnn, lstm) with real signal data. compare_models confirmed to return ascending-sorted dict.
 **Human Review:** Student should run `uv run pytest` and `uv run ruff check .` to verify, then merge the Phase 07 PR.
+
+## Prompt 11 — Phase 8: Visualization and Results
+
+**Date:** 2026-05-07
+**Tool/Agent:** Claude Code (claude-sonnet-4-6)
+**Purpose:** Implement visualization, experiment orchestration, and generate all required result artefacts.
+**Prompt Summary:** Asked Claude to start Phase 08 on a fresh branch rebased onto main, update PRD_experiments.md with visualization scope, implement visualization/plots.py (4 plot functions), add experiments/runner.py (run_single, run_noise_sweep), implement DemixingSDK.run(), wire the CLI, write tests, run the actual experiment to produce artefacts in results/, and update README with embedded plots, MSE table, conclusions, and limitations.
+**Files Affected:**
+- `docs/PRD_experiments.md` — added visualization pipeline, scope, Required Outputs checked
+- `src/rnn_lstm_sinusoid_demixing/visualization/plots.py` — implemented plot_signals, plot_loss_curves, plot_prediction_vs_target, plot_mse_vs_noise
+- `src/rnn_lstm_sinusoid_demixing/experiments/__init__.py` — new subpackage
+- `src/rnn_lstm_sinusoid_demixing/experiments/runner.py` — ModelResult, run_single, run_noise_sweep
+- `src/rnn_lstm_sinusoid_demixing/sdk/sdk.py` — implemented DemixingSDK.run(), _save_config, mse_noise_sweep.json saving
+- `src/rnn_lstm_sinusoid_demixing/main.py` — wired CLI to DemixingSDK().run(), prints sorted MSE table
+- `tests/unit/test_plots.py` — 11 tests (file saved, nonempty, multi-signal, single epoch, etc.)
+- `tests/unit/test_imports.py` — added import test for experiments.runner (total: 20)
+- `tests/integration/test_experiment.py` — 8 tests for run_single and run_noise_sweep
+- `results/` — all 12 artefacts: 9 PNG plots + 3 JSON files
+- `README.md` — Results section with 9 embedded images, MSE table, conclusions, limitations
+- `docs/TODO.md` — Phase 8 items all checked
+**Outcome:** 190 tests pass; ruff clean; 91% coverage. Full experiment ran for ~20 minutes generating all required plots. Test MSE at noise=0.1: FC=0.2344, LSTM=0.2634, RNN=0.2696.
+**Human Review:** Student should review the generated plots in results/, verify README renders correctly on GitHub, and confirm MSE values are reasonable before merging.
