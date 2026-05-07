@@ -12,6 +12,7 @@ dependencies = [
     "numpy>=2.4.4",
     "pandas>=3.0.2",
     "rich>=15.0.0",
+    "torch>=2.0",
     "typer>=0.25.1",
 ]
 
@@ -26,5 +27,6 @@ build-backend = "uv_build"
 dev = [
     "coverage>=7.13.5",
     "pytest>=9.0.3",
+    "pytest-cov>=6.0",
     "ruff>=0.15.12",
 ]

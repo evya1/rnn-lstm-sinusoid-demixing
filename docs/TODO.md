@@ -19,17 +19,22 @@ Completed in commit: `c5aac32`
 - [x] Create `docs/PLAN.md`.
 - [x] Create `docs/TODO.md`.
 - [x] Create `docs/PROMPTS.md`.
-- [ ] Review documentation and align it with assignment requirements.
+- [x] Review documentation and align it with assignment requirements.
 
 ## Phase 3 — Project Skeleton
 
 Planned branch: `phase-03/project-skeleton`
 Planned PR: TBD
 
-- [ ] Create source subpackages: `data`, `models`, `training`, `evaluation`, `visualization`.
-- [ ] Create unit and integration test directories.
-- [ ] Add placeholder implementation files.
-- [ ] Add project constants/configuration.
+- [x] Create source subpackages: `data`, `models`, `training`, `evaluation`, `visualization`, `shared`, `sdk`.
+- [x] Create unit and integration test directories.
+- [x] Add placeholder implementation files (stubs with docstrings).
+- [x] Add project constants/configuration (`constants.py`, `shared/config.py`, `config/default.json`).
+- [x] Add `torch` and `pytest-cov` to `pyproject.toml`.
+- [x] Add `results/.gitkeep` and `assets/.gitkeep`.
+- [x] Create stub sub-PRDs: `PRD_signal_generation.md`, `PRD_dataset_builder.md`, `PRD_model_comparison.md`, `PRD_experiments.md`.
+- [x] Add smoke tests: `test_imports.py`, `test_config.py`, `test_paths.py`.
+- [ ] Flesh out `docs/PRD_signal_generation.md` before Phase 4.
 
 ## Phase 4 — Data Generation
 
