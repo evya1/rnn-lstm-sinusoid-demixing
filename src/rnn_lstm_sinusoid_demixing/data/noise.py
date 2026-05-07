@@ -19,5 +19,7 @@ def gaussian_noise(
     Returns:
         Array of the given shape filled with N(0, std) samples.
     """
+    if std == 0.0:
+        return np.zeros(shape, dtype=np.float32)
     rng = np.random.default_rng(random_seed)
     return rng.normal(loc=0.0, scale=std, size=shape).astype(np.float32)
