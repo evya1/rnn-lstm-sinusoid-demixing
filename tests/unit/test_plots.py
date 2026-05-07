@@ -1,7 +1,6 @@
 """Unit tests for visualization/plots.py."""
 
 import numpy as np
-import pytest
 
 from rnn_lstm_sinusoid_demixing.visualization.plots import (
     plot_loss_curves,
