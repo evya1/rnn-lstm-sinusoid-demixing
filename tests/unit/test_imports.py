@@ -61,5 +61,13 @@ def test_import_visualization_plots() -> None:
     from rnn_lstm_sinusoid_demixing.visualization import plots  # noqa: F401
 
 
+def test_import_models_input_prep() -> None:
+    from rnn_lstm_sinusoid_demixing.models import input_prep  # noqa: F401
+
+
+def test_import_models_factory() -> None:
+    from rnn_lstm_sinusoid_demixing.models import factory  # noqa: F401
+
+
 def test_import_sdk() -> None:
     from rnn_lstm_sinusoid_demixing.sdk import sdk  # noqa: F401
