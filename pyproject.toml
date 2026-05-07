@@ -1,0 +1,30 @@
+[project]
+name = "rnn-lstm-sinusoid-demixing"
+version = "0.1.0"
+description = "RNN and LSTM based sinusoid demixing from noisy composite signals"
+readme = "README.md"
+authors = [
+    { name = "evya1", email = "103887518+evya1@users.noreply.github.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "matplotlib>=3.10.9",
+    "numpy>=2.4.4",
+    "pandas>=3.0.2",
+    "rich>=15.0.0",
+    "typer>=0.25.1",
+]
+
+[project.scripts]
+rnn-lstm-sinusoid-demixing = "rnn_lstm_sinusoid_demixing:main"
+
+[build-system]
+requires = ["uv_build>=0.11.8,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "coverage>=7.13.5",
+    "pytest>=9.0.3",
+    "ruff>=0.15.12",
+]
