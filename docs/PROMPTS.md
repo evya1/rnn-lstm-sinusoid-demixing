@@ -135,3 +135,24 @@ Asked whether it is better to create a dedicated branch and pull request for eac
 
 Outcome:
 The project will continue with short-lived phase branches and pull requests. Each major phase will be implemented in a dedicated branch, pushed to GitHub, reviewed through a pull request, and merged into `main`.
+
+## Prompt 10 — Phase 7: Training and Evaluation
+
+**Date:** 2026-05-07
+**Tool/Agent:** Claude Code (claude-sonnet-4-6)
+**Purpose:** Implement the full training and evaluation pipeline: data splitting, DataLoader construction, Trainer class, MSE metric, and model comparison utility.
+**Prompt Summary:** Asked Claude to start Phase 07 on a fresh branch rebased onto main, flesh out PRD_experiments.md, then implement data/dataloader.py (split_dataset, make_loader), training/trainer.py (Trainer.train_epoch, evaluate, fit), evaluation/metrics.py (compute_mse), evaluation/compare.py (compare_models), unit tests for each module, and an integration smoke test for the full training loop across all three model types.
+**Files Affected:**
+- `docs/PRD_experiments.md` — fleshed out with data pipeline, Trainer interface table, baseline params, fairness rules, acceptance criteria
+- `src/rnn_lstm_sinusoid_demixing/data/dataloader.py` — new: `split_dataset` and `make_loader`
+- `src/rnn_lstm_sinusoid_demixing/training/trainer.py` — implemented `Trainer.train_epoch`, `evaluate`, `fit`
+- `src/rnn_lstm_sinusoid_demixing/evaluation/metrics.py` — implemented `compute_mse`
+- `src/rnn_lstm_sinusoid_demixing/evaluation/compare.py` — implemented `compare_models`
+- `tests/unit/test_dataloader.py` — 14 unit tests for split_dataset and make_loader
+- `tests/unit/test_metrics.py` — 7 unit tests for compute_mse
+- `tests/unit/test_compare.py` — 6 unit tests for compare_models
+- `tests/integration/test_training.py` — 5 integration smoke tests (fit completes, finite losses, compare_models end-to-end)
+- `tests/unit/test_imports.py` — added import smoke test for data.dataloader
+- `docs/TODO.md` — Phase 7 items marked complete
+**Outcome:** 170 tests pass; ruff clean. Trainer verified on all three model types (fc, rnn, lstm) with real signal data. compare_models confirmed to return ascending-sorted dict.
+**Human Review:** Student should run `uv run pytest` and `uv run ruff check .` to verify, then merge the Phase 07 PR.
