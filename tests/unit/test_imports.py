@@ -69,5 +69,9 @@ def test_import_models_factory() -> None:
     from rnn_lstm_sinusoid_demixing.models import factory  # noqa: F401
 
 
+def test_import_data_dataloader() -> None:
+    from rnn_lstm_sinusoid_demixing.data import dataloader  # noqa: F401
+
+
 def test_import_sdk() -> None:
     from rnn_lstm_sinusoid_demixing.sdk import sdk  # noqa: F401
