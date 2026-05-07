@@ -393,6 +393,17 @@ a denoising pre-processing step would likely reduce MSE further.
 
 ---
 
+## Future Improvements
+
+- **Longer context windows**: Increasing the context window beyond 10 samples would expose more signal cycles, potentially allowing RNN and LSTM models to exploit temporal dependencies and close the performance gap with FC.
+- **Additional frequency scenarios**: `constants.py` defines `low_mixed`, `wide_gap`, and `close_low` frequency sets; benchmarking all scenarios would characterise model robustness to frequency spacing.
+- **Hyperparameter search**: RNN and LSTM hidden-size, number of layers, and dropout were not tuned; a grid or random search could reduce their MSE disadvantage relative to FC.
+- **Attention-based architectures**: A lightweight Transformer (self-attention over the 10-sample window) may outperform recurrent models where the one-hot selector provides a direct frequency hint with no long-range dependency.
+- **Varying amplitudes and phases**: All components share amplitude 1.0 and zero phase; per-component amplitude and phase variation would stress-test generalisation beyond the baseline configuration.
+- **GPU support**: Enabling CUDA device selection in `TrainingConfig` would reduce wall-clock time for longer noise sweeps or larger architectures.
+
+---
+
 ## AI Usage Disclosure
 
 This project was developed using **Claude Code** (claude-sonnet-4-6) as an
