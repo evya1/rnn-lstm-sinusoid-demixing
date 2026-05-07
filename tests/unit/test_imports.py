@@ -73,5 +73,9 @@ def test_import_data_dataloader() -> None:
     from rnn_lstm_sinusoid_demixing.data import dataloader  # noqa: F401
 
 
+def test_import_experiments_runner() -> None:
+    from rnn_lstm_sinusoid_demixing.experiments import runner  # noqa: F401
+
+
 def test_import_sdk() -> None:
     from rnn_lstm_sinusoid_demixing.sdk import sdk  # noqa: F401
