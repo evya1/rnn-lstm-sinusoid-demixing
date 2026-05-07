@@ -51,10 +51,10 @@ Planned PR: TBD
 Planned branch: `phase-05/dataset-builder`
 Planned PR: TBD
 
-- [ ] Implement fixed-size context windows.
-- [ ] Implement one-hot selector construction.
-- [ ] Implement target clean-window extraction.
-- [ ] Add unit tests for dataset shapes and correctness.
+- [x] Implement fixed-size context windows.
+- [x] Implement one-hot selector construction.
+- [x] Implement target clean-window extraction.
+- [x] Add unit tests for dataset shapes and correctness.
 
 ## Phase 6 — Models
 
