@@ -73,10 +73,14 @@ Planned PR: TBD
 Planned branch: `phase-07/training-evaluation`
 Planned PR: TBD
 
-- [ ] Implement training loop.
-- [ ] Implement MSE metric.
-- [ ] Implement model comparison script.
-- [ ] Add smoke test for a short training run.
+- [x] Flesh out `docs/PRD_experiments.md` with full protocol.
+- [x] Implement `data/dataloader.py`: `split_dataset` and `make_loader`.
+- [x] Implement `training/trainer.py`: `Trainer.train_epoch`, `evaluate`, `fit`.
+- [x] Implement `evaluation/metrics.py`: `compute_mse`.
+- [x] Implement `evaluation/compare.py`: `compare_models`.
+- [x] Add unit tests: `test_dataloader.py`, `test_metrics.py`, `test_compare.py`.
+- [x] Add integration smoke test: `tests/integration/test_training.py`.
+- [x] All 170 tests pass; ruff clean.
 
 ## Phase 8 — Visualization and Results
 

@@ -152,6 +152,59 @@ model = create_model("lstm", SignalConfig(), TrainingConfig())
 
 ---
 
+## Training & Evaluation
+
+Implemented in `src/.../training/trainer.py`, `data/dataloader.py`,
+`evaluation/metrics.py`, and `evaluation/compare.py`.
+
+```python
+import torch
+from rnn_lstm_sinusoid_demixing.data.dataloader import split_dataset, make_loader
+from rnn_lstm_sinusoid_demixing.data.dataset_builder import build_dataset
+from rnn_lstm_sinusoid_demixing.data.signal_generator import build_signals
+from rnn_lstm_sinusoid_demixing.evaluation.compare import compare_models
+from rnn_lstm_sinusoid_demixing.evaluation.metrics import compute_mse
+from rnn_lstm_sinusoid_demixing.models.factory import create_model
+from rnn_lstm_sinusoid_demixing.shared.config import SignalConfig, TrainingConfig
+from rnn_lstm_sinusoid_demixing.training.losses import mse_loss
+from rnn_lstm_sinusoid_demixing.training.trainer import Trainer
+
+sc, tc = SignalConfig(), TrainingConfig()
+_, clean, _, composite = build_signals(sc)
+inputs, selectors, targets = build_dataset(composite, clean, sc.context_window, sc.num_components)
+splits = split_dataset(inputs, selectors, targets, random_seed=tc.random_seed)
+
+results = {}
+for model_type in ("fc", "rnn", "lstm"):
+    model = create_model(model_type, sc, tc)
+    optimizer = torch.optim.Adam(model.parameters(), lr=tc.learning_rate)
+    trainer = Trainer(model, optimizer, mse_loss())
+
+    train_loader = make_loader(*splits["train"], model_type, tc.batch_size)
+    val_loader   = make_loader(*splits["val"],   model_type, tc.batch_size, shuffle=False)
+    history = trainer.fit(train_loader, val_loader, tc.num_epochs)
+    # history == {"train": [loss_epoch1, ...], "val": [loss_epoch1, ...]}
+
+    test_loader = make_loader(*splits["test"], model_type, tc.batch_size, shuffle=False)
+    results[model_type] = trainer.evaluate(test_loader)
+
+ranking = compare_models(results)
+# ranking == {"fc": 0.021, "lstm": 0.018, "rnn": 0.024}  (sorted ascending)
+```
+
+**Trainer interface:**
+
+| Method | Signature | Returns |
+|--------|-----------|---------|
+| `train_epoch` | `(loader) -> float` | Mean train loss for the epoch |
+| `evaluate` | `(loader) -> float` | Mean loss over the loader |
+| `fit` | `(train_loader, val_loader, num_epochs) -> dict` | `{"train": [...], "val": [...]}` |
+
+The `DataLoader` from `make_loader` already yields model-ready tensors
+(`prepare_fc_input` / `prepare_seq_input` are applied once at construction).
+
+---
+
 ## Project Structure
 
 ```
@@ -161,7 +214,8 @@ src/rnn_lstm_sinusoid_demixing/
 ├── data/
 │   ├── signal_generator.py   # Phase 04 ✓
 │   ├── noise.py              # Phase 04 ✓
-│   └── dataset_builder.py    # Phase 05 ✓
+│   ├── dataset_builder.py    # Phase 05 ✓
+│   └── dataloader.py         # Phase 07 ✓
 ├── models/
 │   ├── fully_connected.py    # Phase 06 ✓
 │   ├── rnn_model.py          # Phase 06 ✓
@@ -169,11 +223,11 @@ src/rnn_lstm_sinusoid_demixing/
 │   ├── input_prep.py         # Phase 06 ✓
 │   └── factory.py            # Phase 06 ✓
 ├── training/
-│   ├── trainer.py            # Phase 07 (stub)
-│   └── losses.py             # Phase 07 (stub)
+│   ├── trainer.py            # Phase 07 ✓
+│   └── losses.py             # Phase 07 ✓
 ├── evaluation/
-│   ├── metrics.py            # Phase 07 (stub)
-│   └── compare.py            # Phase 07 (stub)
+│   ├── metrics.py            # Phase 07 ✓
+│   └── compare.py            # Phase 07 ✓
 ├── visualization/
 │   └── plots.py              # Phase 08 (stub)
 └── shared/
@@ -193,8 +247,8 @@ src/rnn_lstm_sinusoid_demixing/
 | 04 | Data generation | ✅ merged |
 | 05 | Dataset builder | ✅ merged |
 | 06 | Models (FC, RNN, LSTM) | ✅ merged |
-| 07 | Training & evaluation loop | 🔜 next |
-| 08 | Visualization & results | 🔜 planned |
+| 07 | Training & evaluation loop | ✅ merged |
+| 08 | Visualization & results | 🔜 next |
 | 09 | Final submission polish | 🔜 planned |
 
 ---
@@ -202,27 +256,50 @@ src/rnn_lstm_sinusoid_demixing/
 ## Testing
 
 ```
-uv run pytest            →  131 passed  (unit + integration)
+uv run pytest            →  170 passed  (unit + integration)
 uv run ruff check .      →  All checks passed
+uv run pytest --cov=src  →  96% coverage
 ```
 
 Unit tests cover: config validation, path helpers, signal generation,
-dataset construction, all three models, input preparation, and model factory.
+dataset construction, all three models, input preparation, model factory,
+dataloader splitting, MSE metric, and model comparison.
 
 Integration tests cover: full pipeline from `build_signals` →
-`build_dataset` → `create_model` → forward pass for all three model families.
+`build_dataset` → `create_model` → forward pass; and the full training
+loop (Trainer.fit → compute_mse → compare_models) for all three model families.
 
 ---
 
-## Experiment Protocol *(Phase 07–08)*
+## Experiment Protocol
 
-Planned experiments:
+The training pipeline (Phase 07) is fully implemented. Experiments run with:
 
-- Baseline noise sweep: `noise_levels = [0.00, 0.01, 0.05, 0.10, 0.20]`
-- Frequency scenarios: `baseline`, `low_mixed`, `wide_gap`, `close_low`
-- All models trained on identical splits with the same random seed
+```python
+frequencies    = [1, 3, 5, 7]          # Hz per component
+noise_levels   = [0.00, 0.01, 0.05, 0.10, 0.20]
+context_window = 10                     # samples per window
+models         = ["fc", "rnn", "lstm"]
+num_epochs     = 50
+batch_size     = 64
+random_seed    = 42
+```
 
-Results, plots, and conclusions will be added after Phase 07–08.
+All three models use **identical dataset splits and the same seed** for fair comparison
+(see Fairness Rules in `docs/PRD_experiments.md`).
+
+Additional frequency scenarios planned for Phase 08:
+
+```python
+frequency_scenarios = {
+    "baseline":  [1, 3, 5, 7],
+    "low_mixed": [0.5, 1, 3, 7],
+    "wide_gap":  [1, 5, 20, 40],
+    "close_low": [1, 2, 3, 4],
+}
+```
+
+Loss curves, MSE tables, and prediction plots will be added in Phase 08.
 
 ---
 

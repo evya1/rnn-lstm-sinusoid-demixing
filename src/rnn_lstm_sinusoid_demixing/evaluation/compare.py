@@ -1,19 +1,13 @@
 """Model comparison utilities."""
 
-from typing import Any
 
-from numpy.typing import NDArray
-
-
-def compare_models(
-    results: dict[str, dict[str, Any]],
-) -> NDArray:
-    """Summarise test MSE for each model into a comparison table.
+def compare_models(results: dict[str, float]) -> dict[str, float]:
+    """Sort models by ascending test MSE.
 
     Args:
-        results: Mapping model_name -> {'test_mse': float, ...}.
+        results: Mapping model_name -> test_mse (scalar float).
 
     Returns:
-        Structured array or dict ready for display and saving.
+        Dict sorted by ascending test MSE value.
     """
-    raise NotImplementedError("Phase 7: compare.compare_models")
+    return dict(sorted(results.items(), key=lambda item: item[1]))
