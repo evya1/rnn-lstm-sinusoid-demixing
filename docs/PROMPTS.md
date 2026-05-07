@@ -75,6 +75,21 @@ The documentation files were populated with initial meaningful content before co
 **Outcome:** Full project skeleton created. All subpackages import cleanly. Config dataclasses validate inputs. Path helpers resolve correctly. No ML logic implemented yet.
 **Human Review:** Student should verify `uv run pytest tests/unit -v` and `uv run ruff check .` pass before committing.
 
+## Prompt 8 — Phase 5: Dataset Builder
+
+**Date:** 2026-05-07
+**Tool/Agent:** Claude Code
+**Purpose:** Implement Phase 5 — sliding-window dataset construction with one-hot selectors.
+**Prompt Summary:** Asked Claude to checkout and rebase phase-05/dataset-builder, flesh out PRD_dataset_builder.md, implement the three functions in dataset_builder.py, and write unit tests.
+**Files Affected:**
+- `docs/PRD_dataset_builder.md` — fleshed out with function interface, output contracts, and acceptance tests
+- `src/rnn_lstm_sinusoid_demixing/data/dataset_builder.py` — implemented `make_one_hot`, `extract_windows`, `build_dataset`
+- `tests/unit/test_dataset_builder.py` — 24 unit tests covering shape, dtype, one-hot validity, target correctness, and error handling
+- `docs/TODO.md` — Phase 5 items marked complete
+- `docs/PROMPTS.md` — this entry
+**Outcome:** 85 unit tests pass (61 from Phases 3–4 + 24 new). Ruff clean. One-hot correctness, target alignment, and shape contracts verified by tests.
+**Human Review:** Student should verify `uv run pytest tests/unit -v` and `uv run ruff check .` pass before committing.
+
 ## Prompt 7 — Phase 4: Data Generation
 
 **Date:** 2026-05-07
