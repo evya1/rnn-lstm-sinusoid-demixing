@@ -386,12 +386,13 @@ Use short-lived phase branches:
 ```text
 phase-01/project-setup
 phase-02/docs-prd-plan-todo
-phase-03/signal-generation
-phase-04/dataset-builder
-phase-05-models
-phase-06-training-loop
-phase-07-evaluation-plots
-phase-08-readme-polish
+phase-03/project-skeleton
+phase-04/data-generation
+phase-05/dataset-builder
+phase-06/models
+phase-07/training-evaluation
+phase-08/visualization-results
+phase-09/final-submission
 ```
 
 Each phase should have:
