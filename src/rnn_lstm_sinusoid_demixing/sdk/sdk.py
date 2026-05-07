@@ -66,9 +66,14 @@ class DemixingSDK:
         mse_by_model = run_noise_sweep(tc, noise_levels, sc)
         plot_mse_vs_noise(noise_levels, mse_by_model, rdir / "mse_vs_noise.png")
 
-        # --- Save JSON summary ---
+        # --- Save JSON summaries ---
         summary = {mt: float(res.test_mse) for mt, res in results.items()}
         (rdir / "mse_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+        sweep_data = {
+            "noise_levels": noise_levels,
+            "mse_by_model": {mt: [float(v) for v in vals] for mt, vals in mse_by_model.items()},
+        }
+        (rdir / "mse_noise_sweep.json").write_text(json.dumps(sweep_data, indent=2), encoding="utf-8")
         _save_config(sc, tc, rdir)
 
         return summary
