@@ -61,10 +61,10 @@ Planned PR: TBD
 Planned branch: `phase-06/models`
 Planned PR: TBD
 
-- [ ] Implement Fully Connected model.
-- [ ] Implement RNN model.
-- [ ] Implement LSTM model.
-- [ ] Add forward-pass tests for all models.
+- [x] Implement Fully Connected model.
+- [x] Implement RNN model.
+- [x] Implement LSTM model.
+- [x] Add forward-pass tests for all models.
 
 ## Phase 7 — Training and Evaluation
 
