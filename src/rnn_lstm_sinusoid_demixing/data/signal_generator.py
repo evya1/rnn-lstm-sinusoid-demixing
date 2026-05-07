@@ -24,7 +24,7 @@ def generate_time_axis(sampling_rate: int, duration_seconds: float) -> NDArray:
         1-D float32 array where t[k] = k / sampling_rate.
     """
     num_samples = int(sampling_rate * duration_seconds)
-    return (np.arange(num_samples) / sampling_rate).astype(np.float32)
+    return np.linspace(0.0, duration_seconds, num_samples, endpoint=False, dtype=np.float32)
 
 
 def generate_clean_sinusoid(
@@ -70,7 +70,7 @@ def generate_noisy_composite(
         component + gaussian_noise(component.shape, std=noise_level, random_seed=random_seed + i)
         for i, component in enumerate(clean_components)
     ]
-    composite = np.stack(noisy).sum(axis=0).astype(np.float32)
+    composite = np.add.reduce(noisy).astype(np.float32)
     return noisy, composite
 
 
