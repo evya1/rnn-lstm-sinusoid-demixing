@@ -449,7 +449,7 @@ src/rnn_lstm_sinusoid_demixing/
 | 06 | Models (FC, RNN, LSTM) | ✅ merged |
 | 07 | Training & evaluation loop | ✅ merged |
 | 08 | Visualization & results | ✅ merged |
-| 09 | Final submission polish | 🔜 planned |
+| 09 | Final submission polish | ✅ complete |
 
 ---
 
