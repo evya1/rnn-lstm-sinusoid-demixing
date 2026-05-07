@@ -1,0 +1,20 @@
+{
+  "signal": {
+    "frequencies": [
+      1.0,
+      3.0,
+      5.0,
+      7.0
+    ],
+    "sampling_rate": 1000,
+    "duration_seconds": 10.0,
+    "noise_level": 0.1,
+    "context_window": 10
+  },
+  "training": {
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "num_epochs": 50,
+    "random_seed": 42
+  }
+}
