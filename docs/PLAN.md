@@ -81,4 +81,22 @@ The project will include:
 * If LSTM/RNN models are too slow, reduce hidden size and number of epochs.
 * If results are unclear, add controlled experiments with fixed random seeds.
 * If plots are too noisy, visualize short windows rather than full signals.
-* 
+
+
+## 7. Branch and Pull Request Workflow
+
+Development will continue using short-lived feature branches and pull requests.
+
+Each major project phase will be implemented in a dedicated branch. After the phase is complete, the branch will be pushed to GitHub and merged into `main` through a pull request.
+
+Planned branch structure:
+
+```text
+phase-03/project-skeleton
+phase-04/data-generation
+phase-05/dataset-builder
+phase-06/models
+phase-07/training-evaluation
+phase-08/visualization-results
+phase-09/final-submission
+```

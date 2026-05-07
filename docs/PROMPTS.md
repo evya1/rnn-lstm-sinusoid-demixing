@@ -41,3 +41,13 @@ Asked what to do after creating `docs/PRD.md`, `docs/PLAN.md`, `docs/TODO.md`, a
 
 Outcome:
 The documentation files were populated with initial meaningful content before committing them.
+
+## Prompt 5 — Branch and Pull Request Workflow
+
+Purpose: Decide whether to continue development directly on `main` or use feature branches and pull requests for each major phase.
+
+Summary:
+Asked whether it is better to create a dedicated branch and pull request for each major project phase.
+
+Outcome:
+The project will continue with short-lived phase branches and pull requests. Each major phase will be implemented in a dedicated branch, pushed to GitHub, reviewed through a pull request, and merged into `main`.

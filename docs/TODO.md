@@ -9,7 +9,11 @@
 - [x] Add `.gitignore`.
 - [x] Add first signed commit.
 
+Completed in commit: `1de5870`
+
 ## Phase 2 — Documentation Setup
+
+Completed in commit: `c5aac32`
 
 - [x] Create `docs/PRD.md`.
 - [x] Create `docs/PLAN.md`.
@@ -19,12 +23,18 @@
 
 ## Phase 3 — Project Skeleton
 
+Planned branch: `phase-03/project-skeleton`
+Planned PR: TBD
+
 - [ ] Create source subpackages: `data`, `models`, `training`, `evaluation`, `visualization`.
 - [ ] Create unit and integration test directories.
 - [ ] Add placeholder implementation files.
 - [ ] Add project constants/configuration.
 
 ## Phase 4 — Data Generation
+
+Planned branch: `phase-04/data-generation`
+Planned PR: TBD
 
 - [ ] Implement clean sinusoid generation.
 - [ ] Implement noise injection.
@@ -33,12 +43,18 @@
 
 ## Phase 5 — Dataset Builder
 
+Planned branch: `phase-05/dataset-builder`
+Planned PR: TBD
+
 - [ ] Implement fixed-size context windows.
 - [ ] Implement one-hot selector construction.
 - [ ] Implement target clean-window extraction.
 - [ ] Add unit tests for dataset shapes and correctness.
 
 ## Phase 6 — Models
+
+Planned branch: `phase-06/models`
+Planned PR: TBD
 
 - [ ] Implement Fully Connected model.
 - [ ] Implement RNN model.
@@ -47,12 +63,18 @@
 
 ## Phase 7 — Training and Evaluation
 
+Planned branch: `phase-07/training-evaluation`
+Planned PR: TBD
+
 - [ ] Implement training loop.
 - [ ] Implement MSE metric.
 - [ ] Implement model comparison script.
 - [ ] Add smoke test for a short training run.
 
 ## Phase 8 — Visualization and Results
+
+Planned branch: `phase-08/visualization-results`
+Planned PR: TBD
 
 - [ ] Plot clean sinusoidal components.
 - [ ] Plot noisy composite signal.
@@ -62,10 +84,12 @@
 
 ## Phase 9 — Final Submission
 
+Planned branch: `phase-09/final-submission`
+Planned PR: TBD
+
 - [ ] Update README with final explanation and results.
 - [ ] Add generated plots required for the report.
 - [ ] Verify `uv run pytest`.
 - [ ] Verify `uv run ruff check .`.
 - [ ] Push final commits to GitHub.
 - [ ] Submit the required PDF form with the GitHub repository link.
-- 
