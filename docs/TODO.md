@@ -87,11 +87,21 @@ Planned PR: TBD
 Planned branch: `phase-08/visualization-results`
 Planned PR: TBD
 
-- [ ] Plot clean sinusoidal components.
-- [ ] Plot noisy composite signal.
-- [ ] Plot prediction vs target examples.
-- [ ] Plot loss curves.
-- [ ] Plot MSE comparison across models and noise levels.
+- [x] Flesh out `docs/PRD_experiments.md` with visualization pipeline.
+- [x] Implement `visualization/plots.py`: 4 plot functions.
+- [x] Add `experiments/runner.py`: `run_single`, `run_noise_sweep`, `ModelResult`.
+- [x] Implement `sdk/sdk.py` `DemixingSDK.run()` end-to-end pipeline.
+- [x] Wire `main.py` CLI to `DemixingSDK().run()`.
+- [x] Plot clean sinusoidal components (`results/signals_clean.png`).
+- [x] Plot noisy composite signal (`results/signals_composite.png`, `signals_noisy.png`).
+- [x] Plot prediction vs target examples for FC, RNN, LSTM.
+- [x] Plot loss curves for FC, RNN, LSTM.
+- [x] Plot MSE comparison across noise levels (`results/mse_vs_noise.png`).
+- [x] Save `results/mse_summary.json` and `results/experiment_config.json`.
+- [x] Add unit tests: `test_plots.py` (11 tests).
+- [x] Add integration tests: `test_experiment.py` (8 tests).
+- [x] Update README with embedded plots, MSE table, conclusions, limitations.
+- [x] All 190 tests pass; ruff clean; 91% coverage.
 
 ## Phase 9 — Final Submission
 

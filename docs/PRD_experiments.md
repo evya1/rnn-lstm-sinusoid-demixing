@@ -7,7 +7,8 @@ and what artefacts to produce and save.
 
 ## Scope
 
-Covers modules: `src/.../training/`, `src/.../evaluation/`, `src/.../data/dataloader.py`.
+Covers modules: `src/.../training/`, `src/.../evaluation/`, `src/.../data/dataloader.py`,
+`src/.../visualization/plots.py`, `src/.../experiments/runner.py`, `src/.../sdk/sdk.py`.
 
 ## Data Pipeline for Training
 
@@ -55,13 +56,31 @@ frequency_scenarios = {
 }
 ```
 
+## Visualization Pipeline
+
+After `Trainer.fit` and test-set evaluation, the following plots are produced by
+`visualization/plots.py` and saved to `results/`:
+
+| Function | Output file | Input |
+|----------|-------------|-------|
+| `plot_signals` | `signals_clean.png`, `signals_noisy.png`, `signals_composite.png` | `build_signals` output |
+| `plot_loss_curves` | `loss_curves_{model}.png` | `Trainer.fit` history |
+| `plot_prediction_vs_target` | `prediction_vs_target_{model}.png` | one test example |
+| `plot_mse_vs_noise` | `mse_vs_noise.png` | noise sweep results |
+
+The experiment runner `experiments/runner.py` exports:
+- `run_single(signal_config, training_config)` → per-model results dict
+- `run_noise_sweep(training_config, noise_levels, base_config)` → `{model: [mse_per_level]}`
+
+The SDK facade `sdk/sdk.py` orchestrates the full pipeline end-to-end and saves all artefacts.
+
 ## Required Outputs
 
-- [ ] Training and validation loss curves per model (saved to `results/`).
-- [ ] Test MSE table: model × noise level.
-- [ ] MSE vs noise level plot.
-- [ ] Prediction vs target example plots for each model.
-- [ ] Saved experiment config (JSON) alongside each result.
+- [x] Training and validation loss curves per model (saved to `results/`).
+- [x] Test MSE table: model × noise level.
+- [x] MSE vs noise level plot.
+- [x] Prediction vs target example plots for each model.
+- [x] Saved experiment config (JSON) alongside each result.
 
 ## Fairness Rules
 
