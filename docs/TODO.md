@@ -34,17 +34,17 @@ Planned PR: TBD
 - [x] Add `results/.gitkeep` and `assets/.gitkeep`.
 - [x] Create stub sub-PRDs: `PRD_signal_generation.md`, `PRD_dataset_builder.md`, `PRD_model_comparison.md`, `PRD_experiments.md`.
 - [x] Add smoke tests: `test_imports.py`, `test_config.py`, `test_paths.py`.
-- [ ] Flesh out `docs/PRD_signal_generation.md` before Phase 4.
+- [x] Flesh out `docs/PRD_signal_generation.md` before Phase 4.
 
 ## Phase 4 — Data Generation
 
 Planned branch: `phase-04/data-generation`
 Planned PR: TBD
 
-- [ ] Implement clean sinusoid generation.
-- [ ] Implement noise injection.
-- [ ] Implement noisy composite signal creation.
-- [ ] Add unit tests for signal generation.
+- [x] Implement clean sinusoid generation.
+- [x] Implement noise injection.
+- [x] Implement noisy composite signal creation.
+- [x] Add unit tests for signal generation.
 
 ## Phase 5 — Dataset Builder
 
