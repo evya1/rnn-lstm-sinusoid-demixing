@@ -25,8 +25,18 @@ class LSTMModel(nn.Module):
         num_layers: int = 1,
     ) -> None:
         super().__init__()
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
         self.output_layer = nn.Linear(hidden_size, 1)
+
+    def __repr__(self) -> str:
+        return (
+            f"LSTMModel(input_size={self.input_size}, "
+            f"hidden_size={self.hidden_size}, "
+            f"num_layers={self.num_layers})"
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass.
