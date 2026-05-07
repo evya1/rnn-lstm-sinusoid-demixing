@@ -228,8 +228,10 @@ src/rnn_lstm_sinusoid_demixing/
 ├── evaluation/
 │   ├── metrics.py            # Phase 07 ✓
 │   └── compare.py            # Phase 07 ✓
+├── experiments/
+│   └── runner.py             # Phase 08 ✓
 ├── visualization/
-│   └── plots.py              # Phase 08 (stub)
+│   └── plots.py              # Phase 08 ✓
 └── shared/
     ├── config.py             # SignalConfig, TrainingConfig
     └── paths.py              # project path helpers
@@ -248,7 +250,7 @@ src/rnn_lstm_sinusoid_demixing/
 | 05 | Dataset builder | ✅ merged |
 | 06 | Models (FC, RNN, LSTM) | ✅ merged |
 | 07 | Training & evaluation loop | ✅ merged |
-| 08 | Visualization & results | 🔜 next |
+| 08 | Visualization & results | ✅ merged |
 | 09 | Final submission polish | 🔜 planned |
 
 ---
@@ -256,24 +258,31 @@ src/rnn_lstm_sinusoid_demixing/
 ## Testing
 
 ```
-uv run pytest            →  170 passed  (unit + integration)
+uv run pytest            →  190 passed  (unit + integration)
 uv run ruff check .      →  All checks passed
-uv run pytest --cov=src  →  96% coverage
+uv run pytest --cov=src  →  91% coverage
 ```
 
 Unit tests cover: config validation, path helpers, signal generation,
 dataset construction, all three models, input preparation, model factory,
-dataloader splitting, MSE metric, and model comparison.
+dataloader splitting, MSE metric, model comparison, and all four plot functions.
 
 Integration tests cover: full pipeline from `build_signals` →
-`build_dataset` → `create_model` → forward pass; and the full training
-loop (Trainer.fit → compute_mse → compare_models) for all three model families.
+`build_dataset` → `create_model` → forward pass; full training loop
+(Trainer.fit → compute_mse → compare_models); and `run_single` /
+`run_noise_sweep` with tiny configs.
 
 ---
 
 ## Experiment Protocol
 
-The training pipeline (Phase 07) is fully implemented. Experiments run with:
+To reproduce all results and regenerate all plots:
+
+```bash
+uv run rnn-lstm-sinusoid-demixing
+```
+
+Experiment configuration (saved in `results/experiment_config.json`):
 
 ```python
 frequencies    = [1, 3, 5, 7]          # Hz per component
@@ -288,18 +297,99 @@ random_seed    = 42
 All three models use **identical dataset splits and the same seed** for fair comparison
 (see Fairness Rules in `docs/PRD_experiments.md`).
 
-Additional frequency scenarios planned for Phase 08:
+---
 
-```python
-frequency_scenarios = {
-    "baseline":  [1, 3, 5, 7],
-    "low_mixed": [0.5, 1, 3, 7],
-    "wide_gap":  [1, 5, 20, 40],
-    "close_low": [1, 2, 3, 4],
-}
-```
+## Results
 
-Loss curves, MSE tables, and prediction plots will be added in Phase 08.
+### Signals
+
+**Clean sinusoidal components (1, 3, 5, 7 Hz):**
+
+![Clean Components](results/signals_clean.png)
+
+**Noisy components (noise σ = 0.1) and composite sum:**
+
+![Noisy Components](results/signals_noisy.png)
+
+![Noisy Composite Signal](results/signals_composite.png)
+
+---
+
+### Training & Validation Loss Curves
+
+All models trained for 50 epochs, batch size 64, learning rate 0.001.
+
+![FC Loss Curves](results/loss_curves_fc.png)
+
+![RNN Loss Curves](results/loss_curves_rnn.png)
+
+![LSTM Loss Curves](results/loss_curves_lstm.png)
+
+---
+
+### Prediction vs Target Examples
+
+Each plot shows the model's reconstruction of a randomly selected clean
+sinusoidal window from the held-out test set (noise σ = 0.1).
+
+![FC Prediction](results/prediction_vs_target_fc.png)
+
+![RNN Prediction](results/prediction_vs_target_rnn.png)
+
+![LSTM Prediction](results/prediction_vs_target_lstm.png)
+
+---
+
+### Test MSE at noise σ = 0.1
+
+| Model | Test MSE |
+|-------|----------|
+| **FC** | **0.2344** |
+| LSTM | 0.2634 |
+| RNN | 0.2696 |
+
+The Fully Connected model achieves the lowest test MSE at this noise level.
+Exact values are in `results/mse_summary.json`.
+
+---
+
+### MSE vs Noise Level
+
+![MSE vs Noise Level](results/mse_vs_noise.png)
+
+Full sweep data (noise levels 0.00, 0.01, 0.05, 0.10, 0.20) in
+`results/mse_noise_sweep.json`.
+
+---
+
+## Conclusions
+
+**FC outperforms RNN and LSTM** on this demixing task at moderate noise (σ=0.1).
+This is expected: the one-hot selector gives the model a direct frequency hint,
+so the demixing problem reduces to a linear projection from the composite window.
+A simple MLP is sufficient to learn this mapping.
+
+**RNN and LSTM** carry the overhead of sequential computation (recurrent hidden
+state across 10 timesteps) without benefiting from long-range temporal structure —
+the 10-sample context window is too short for recurrence to add value over a
+direct feed-forward path.
+
+**The task is partially solved**: all three models predict the correct shape and
+phase of the target sinusoid, but residual noise and the short context window
+limit reconstruction fidelity. Higher sampling rates, longer context windows, or
+a denoising pre-processing step would likely reduce MSE further.
+
+---
+
+## Limitations
+
+- Context window of 10 samples is short: only one full cycle is visible for
+  the 1 Hz component at 10 Hz sampling, making reconstruction harder.
+- Amplitude is fixed at 1.0; varying amplitudes are not tested.
+- Only baseline frequency scenario (`[1, 3, 5, 7]`) was run; additional
+  frequency scenarios (`low_mixed`, `wide_gap`, `close_low`) are defined in
+  `constants.py` but not yet benchmarked.
+- No GPU training; runs on CPU only.
 
 ---
 
