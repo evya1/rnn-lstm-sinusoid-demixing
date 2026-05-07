@@ -108,9 +108,9 @@ Planned PR: TBD
 Planned branch: `phase-09/final-submission`
 Planned PR: TBD
 
-- [ ] Update README with final explanation and results.
-- [ ] Add generated plots required for the report.
-- [ ] Verify `uv run pytest`.
-- [ ] Verify `uv run ruff check .`.
-- [ ] Push final commits to GitHub.
+- [x] Update README with final explanation and results.
+- [x] Add generated plots required for the report.
+- [x] Verify `uv run pytest`.
+- [x] Verify `uv run ruff check .`.
+- [x] Push final commits to GitHub.
 - [ ] Submit the required PDF form with the GitHub repository link.
