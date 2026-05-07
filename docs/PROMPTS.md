@@ -42,6 +42,16 @@ Asked what to do after creating `docs/PRD.md`, `docs/PLAN.md`, `docs/TODO.md`, a
 Outcome:
 The documentation files were populated with initial meaningful content before committing them.
 
+## Prompt 5 — Branch and Pull Request Workflow
+
+Purpose: Decide whether to continue development directly on `main` or use feature branches and pull requests for each major phase.
+
+Summary:
+Asked whether it is better to create a dedicated branch and pull request for each major project phase.
+
+Outcome:
+The project will continue with short-lived phase branches and pull requests. Each major phase will be implemented in a dedicated branch, pushed to GitHub, reviewed through a pull request, and merged into `main`.
+
 ## Prompt 6 — Phase 3: Project Skeleton
 
 **Date:** 2026-05-07
@@ -75,6 +85,37 @@ The documentation files were populated with initial meaningful content before co
 **Outcome:** Full project skeleton created. All subpackages import cleanly. Config dataclasses validate inputs. Path helpers resolve correctly. No ML logic implemented yet.
 **Human Review:** Student should verify `uv run pytest tests/unit -v` and `uv run ruff check .` pass before committing.
 
+## Prompt 7 — Phase 4: Data Generation
+
+**Date:** 2026-05-07
+**Tool/Agent:** Claude Code
+**Purpose:** Implement Phase 4 — clean sinusoid generation, per-component noise injection, noisy composite signal construction, and comprehensive unit tests.
+**Prompt Summary:** Asked Claude to checkout and rebase the phase-04/data-generation branch, read PRD_signal_generation.md and existing stubs, flesh out the PRD, implement the three functions in signal_generator.py plus a build_signals convenience function, add a zero-std guard to noise.py, write tests/unit/test_signal_generator.py, and update TODO and PROMPTS documentation.
+**Files Affected:**
+- `docs/PRD_signal_generation.md` — fleshed out with function interface table, output contracts, and acceptance tests
+- `src/rnn_lstm_sinusoid_demixing/data/signal_generator.py` — implemented `generate_time_axis`, `generate_clean_sinusoid`, `generate_noisy_composite`, and `build_signals`
+- `src/rnn_lstm_sinusoid_demixing/data/noise.py` — added zero-std guard to `gaussian_noise`
+- `tests/unit/test_signal_generator.py` — 25 unit tests across all four functions
+- `docs/TODO.md` — Phase 3 "flesh out PRD" and all Phase 4 items marked complete
+- `docs/PROMPTS.md` — this entry
+**Outcome:** 61 unit tests pass (36 from Phase 3 + 25 new). Ruff clean. All outputs are float32, no NaN/Inf, noise-before-summation pipeline verified by test.
+**Human Review:** Student should verify `uv run pytest tests/unit -v` and `uv run ruff check .` pass before committing.
+
+## Prompt 8 — Phase 5: Dataset Builder
+
+**Date:** 2026-05-07
+**Tool/Agent:** Claude Code
+**Purpose:** Implement Phase 5 — sliding-window dataset construction with one-hot selectors.
+**Prompt Summary:** Asked Claude to checkout and rebase phase-05/dataset-builder, flesh out PRD_dataset_builder.md, implement the three functions in dataset_builder.py, and write unit tests.
+**Files Affected:**
+- `docs/PRD_dataset_builder.md` — fleshed out with function interface, output contracts, and acceptance tests
+- `src/rnn_lstm_sinusoid_demixing/data/dataset_builder.py` — implemented `make_one_hot`, `extract_windows`, `build_dataset`
+- `tests/unit/test_dataset_builder.py` — 24 unit tests covering shape, dtype, one-hot validity, target correctness, and error handling
+- `docs/TODO.md` — Phase 5 items marked complete
+- `docs/PROMPTS.md` — this entry
+**Outcome:** 85 unit tests pass (61 from Phases 3–4 + 24 new). Ruff clean. One-hot correctness, target alignment, and shape contracts verified by tests.
+**Human Review:** Student should verify `uv run pytest tests/unit -v` and `uv run ruff check .` pass before committing.
+
 ## Prompt 9 — Phase 6: Models
 
 **Date:** 2026-05-07
@@ -94,47 +135,6 @@ The documentation files were populated with initial meaningful content before co
 - `docs/PROMPTS.md` — this entry
 **Outcome:** 129 unit tests pass (85 from prior phases + 44 new). Ruff clean. All three models verified for correct output shape, finite values, stored hyperparams, __repr__, input preparation, and factory wiring.
 **Human Review:** Student should verify `uv run pytest tests/unit -v` and `uv run ruff check .` pass before PR.
-
-## Prompt 8 — Phase 5: Dataset Builder
-
-**Date:** 2026-05-07
-**Tool/Agent:** Claude Code
-**Purpose:** Implement Phase 5 — sliding-window dataset construction with one-hot selectors.
-**Prompt Summary:** Asked Claude to checkout and rebase phase-05/dataset-builder, flesh out PRD_dataset_builder.md, implement the three functions in dataset_builder.py, and write unit tests.
-**Files Affected:**
-- `docs/PRD_dataset_builder.md` — fleshed out with function interface, output contracts, and acceptance tests
-- `src/rnn_lstm_sinusoid_demixing/data/dataset_builder.py` — implemented `make_one_hot`, `extract_windows`, `build_dataset`
-- `tests/unit/test_dataset_builder.py` — 24 unit tests covering shape, dtype, one-hot validity, target correctness, and error handling
-- `docs/TODO.md` — Phase 5 items marked complete
-- `docs/PROMPTS.md` — this entry
-**Outcome:** 85 unit tests pass (61 from Phases 3–4 + 24 new). Ruff clean. One-hot correctness, target alignment, and shape contracts verified by tests.
-**Human Review:** Student should verify `uv run pytest tests/unit -v` and `uv run ruff check .` pass before committing.
-
-## Prompt 7 — Phase 4: Data Generation
-
-**Date:** 2026-05-07
-**Tool/Agent:** Claude Code
-**Purpose:** Implement Phase 4 — clean sinusoid generation, per-component noise injection, noisy composite signal construction, and comprehensive unit tests.
-**Prompt Summary:** Asked Claude to checkout and rebase the phase-04/data-generation branch, read PRD_signal_generation.md and existing stubs, flesh out the PRD, implement the three functions in signal_generator.py plus a build_signals convenience function, add a zero-std guard to noise.py, write tests/unit/test_signal_generator.py, and update TODO and PROMPTS documentation.
-**Files Affected:**
-- `docs/PRD_signal_generation.md` — fleshed out with function interface table, output contracts, and acceptance tests
-- `src/rnn_lstm_sinusoid_demixing/data/signal_generator.py` — implemented `generate_time_axis`, `generate_clean_sinusoid`, `generate_noisy_composite`, and `build_signals`
-- `src/rnn_lstm_sinusoid_demixing/data/noise.py` — added zero-std guard to `gaussian_noise`
-- `tests/unit/test_signal_generator.py` — 25 unit tests across all four functions
-- `docs/TODO.md` — Phase 3 "flesh out PRD" and all Phase 4 items marked complete
-- `docs/PROMPTS.md` — this entry
-**Outcome:** 61 unit tests pass (36 from Phase 3 + 25 new). Ruff clean. All outputs are float32, no NaN/Inf, noise-before-summation pipeline verified by test.
-**Human Review:** Student should verify `uv run pytest tests/unit -v` and `uv run ruff check .` pass before committing.
-
-## Prompt 5 — Branch and Pull Request Workflow
-
-Purpose: Decide whether to continue development directly on `main` or use feature branches and pull requests for each major phase.
-
-Summary:
-Asked whether it is better to create a dedicated branch and pull request for each major project phase.
-
-Outcome:
-The project will continue with short-lived phase branches and pull requests. Each major phase will be implemented in a dedicated branch, pushed to GitHub, reviewed through a pull request, and merged into `main`.
 
 ## Prompt 10 — Phase 7: Training and Evaluation
 
@@ -178,3 +178,18 @@ The project will continue with short-lived phase branches and pull requests. Eac
 - `docs/TODO.md` — Phase 8 items all checked
 **Outcome:** 190 tests pass; ruff clean; 91% coverage. Full experiment ran for ~20 minutes generating all required plots. Test MSE at noise=0.1: FC=0.2344, LSTM=0.2634, RNN=0.2696.
 **Human Review:** Student should review the generated plots in results/, verify README renders correctly on GitHub, and confirm MSE values are reasonable before merging.
+
+## Prompt 12 — Phase 9: Final Submission Audit and Fixes
+
+**Date:** 2026-05-08
+**Tool/Agent:** Claude Code (claude-sonnet-4-6)
+**Purpose:** Conduct a full repository audit for submission readiness, identify blockers and warnings, then apply all approved fixes before creating the final PR.
+**Prompt Summary:** Asked Claude to enter AUDIT MODE on branch phase-09/final-submission (rebased above main), inspect all files, run all verification commands (pytest, ruff, coverage), and produce a structured validation report before making any changes. Report identified 1 blocker and 2 warnings. After user approval, fixes were applied: re-ran the full experiment to generate the missing `results/mse_noise_sweep.json`, added a "Future Improvements" section to README.md, reordered PROMPTS.md entries chronologically (Prompts 1–12), and updated TODO.md Phase 09 items.
+**Files Affected:**
+- `results/mse_noise_sweep.json` — generated by re-running full experiment (blocker fix)
+- `results/` — all artefacts refreshed for consistency
+- `README.md` — added Future Improvements section (CLAUDE.md §11 item 13)
+- `docs/PROMPTS.md` — reordered entries 1–12 chronologically; added this entry
+- `docs/TODO.md` — Phase 09 items marked complete
+**Outcome:** All 190 tests pass; ruff clean; 91% coverage. Audit: 43 PASS / 0 FAIL / 0 WARN after fixes. Repository ready for final PR and GitHub submission.
+**Human Review:** Student should verify the regenerated plots in results/ match expectations, review the Phase 09 PR body, and merge to main for final submission.

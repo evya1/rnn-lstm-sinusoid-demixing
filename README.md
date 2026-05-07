@@ -25,17 +25,215 @@ Idea → PRD → PLAN → TODO → Verify → Execute → Test → Document → 
 Four clean sinusoids are generated at frequencies **[1, 3, 5, 7] Hz**.
 Independent Gaussian noise is added to **each component before summation**:
 
-```
-S_i_noisy = A_i · sin(2π f_i t + φ_i) + noise_i
-Σ_noisy   = S_1_noisy + S_2_noisy + S_3_noisy + S_4_noisy
-```
+$$S_{i,\text{noisy}}(t) = A_i \sin(2\pi f_i t + \phi_i) + \varepsilon_i(t), \qquad \varepsilon_i \sim \mathcal{N}(0, \sigma^2)$$
 
-A model receives a short context window from `Σ_noisy` and a one-hot selector
-vector `C`, and must predict the clean window of the selected component:
+$$\Sigma_{\text{noisy}}(t) = \sum_{i=1}^{4} S_{i,\text{noisy}}(t)$$
 
-```
-Input:  (Σ_noisy window, C)   →   Target: S_j_clean window
-```
+Given a noisy mixture window and a one-hot selector $\mathbf{c}_j$, a neural network
+must output the clean window of the selected sinusoidal component:
+
+$$\bigl(\mathbf{x}^{(\Sigma)}_k,\;\mathbf{c}_j\bigr) \;\longrightarrow\; \hat{\mathbf{y}}_{k,j} \approx \mathbf{y}_{k,j}$$
+
+---
+
+## Mathematical Formulation of the Task
+
+### 1. Time Axis and Clean Signals
+
+The discrete time axis of $N$ uniformly spaced samples is:
+
+$$t_n = \frac{n}{f_s}, \qquad n = 0,1,\dots,N-1, \qquad N = T f_s$$
+
+For the baseline experiment: $T = 10\text{ s}$, $f_s = 1000\text{ Hz}$, $N = 10000$.
+
+Implemented by [`generate_time_axis`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py) in
+[`signal_generator.py`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py).
+Default values are defined in [`constants.py`](src/rnn_lstm_sinusoid_demixing/constants.py)
+and loaded into [`SignalConfig`](src/rnn_lstm_sinusoid_demixing/shared/config.py).
+
+Each clean sinusoidal component is:
+
+$$S_i(t) = A_i \sin(2\pi f_i t + \phi_i), \qquad i \in \{1,2,3,4\}$$
+
+For the baseline: $(f_1,f_2,f_3,f_4) = (1,3,5,7)\text{ Hz}$, $A_i = 1.0$, $\phi_i = 0.0$.
+
+Implemented by [`generate_clean_sinusoid`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py) in
+[`signal_generator.py`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py).
+
+---
+
+### 2. Noise Model
+
+A key requirement is that **noise is added to each component independently, before summation**.
+The noise model is additive Gaussian:
+
+$$S_{i,\text{noisy}}(t) = S_i(t) + \varepsilon_i(t), \qquad \varepsilon_i(t) \sim \mathcal{N}(0, \sigma^2)$$
+
+where $\sigma$ = `noise_level` (default 0.1). Each component $i$ receives an independent
+noise draw seeded with `random_seed + i`.
+
+The pipeline applies the transformation $S_i(t) \to S_{i,\text{noisy}}(t)$ **per component**
+before any summation takes place.
+
+Noise sampling is implemented by [`gaussian_noise`](src/rnn_lstm_sinusoid_demixing/data/noise.py) in
+[`noise.py`](src/rnn_lstm_sinusoid_demixing/data/noise.py).
+Per-component injection and summation are performed by
+[`generate_noisy_composite`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py) in
+[`signal_generator.py`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py).
+
+---
+
+### 3. Composite Noisy Mixture
+
+The noisy composite signal is the sum of all noisy components:
+
+$$\Sigma_{\text{noisy}}(t) = \sum_{i=1}^{4} S_{i,\text{noisy}}(t)$$
+
+For reference, the clean mixture (not used as a training target) is:
+
+$$\Sigma_{\text{clean}}(t) = \sum_{i=1}^{4} S_i(t)$$
+
+The model's **input** comes from $\Sigma_{\text{noisy}}$, but the **target** is the
+clean component $S_j$—not the noisy version.
+
+Both $\Sigma_{\text{noisy}}$ and the noisy components are returned by
+[`generate_noisy_composite`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py) and
+its wrapper [`build_signals`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py) in
+[`signal_generator.py`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py).
+
+---
+
+### 4. Training Samples and Windows
+
+With context window length $W = 10$, the noisy mixture window starting at sample $k$ is:
+
+$$\mathbf{x}^{(\Sigma)}_k = \bigl[\Sigma_{\text{noisy}}(t_k),\;\dots,\;\Sigma_{\text{noisy}}(t_{k+W-1})\bigr] \in \mathbb{R}^{W}$$
+
+The one-hot selector identifying component $j$ is:
+
+$$\mathbf{c}_j \in \{0,1\}^{4}, \qquad (\mathbf{c}_j)_i = \begin{cases} 1, & i = j \\ 0, & i \neq j \end{cases}$$
+
+For example, $\mathbf{c}_2 = [0,1,0,0]$ means "reconstruct the clean 3 Hz sinusoid."
+
+The corresponding clean target window is:
+
+$$\mathbf{y}_{k,j} = \bigl[S_j(t_k),\;\dots,\;S_j(t_{k+W-1})\bigr] \in \mathbb{R}^{W}$$
+
+One training example is:
+
+$$X_{k,j} = \bigl(\mathbf{x}^{(\Sigma)}_k,\;\mathbf{c}_j\bigr), \qquad Y_{k,j} = \mathbf{y}_{k,j}$$
+
+With $N = 10000$, $W = 10$, and 4 components: $\text{num\_examples} = (N - W + 1) \times 4 = 39964$.
+
+Window extraction: [`extract_windows`](src/rnn_lstm_sinusoid_demixing/data/dataset_builder.py).
+Selector construction: [`make_one_hot`](src/rnn_lstm_sinusoid_demixing/data/dataset_builder.py).
+Full sample assembly: [`build_dataset`](src/rnn_lstm_sinusoid_demixing/data/dataset_builder.py).
+All three in [`dataset_builder.py`](src/rnn_lstm_sinusoid_demixing/data/dataset_builder.py).
+
+---
+
+### 5. Model Input Representations
+
+**Fully Connected model** — window and selector concatenated into a flat vector:
+
+$$\mathbf{x}^{FC}_{k,j} = \bigl[\mathbf{x}^{(\Sigma)}_k \;\|\; \mathbf{c}_j\bigr] \in \mathbb{R}^{W+4} = \mathbb{R}^{14}$$
+
+The FC model learns $f_\theta^{FC}: \mathbb{R}^{14} \to \mathbb{R}^{10}$ (two hidden layers, 64 units, ReLU).
+
+Implemented by [`prepare_fc_input`](src/rnn_lstm_sinusoid_demixing/models/input_prep.py) in
+[`input_prep.py`](src/rnn_lstm_sinusoid_demixing/models/input_prep.py) and
+[`FullyConnectedModel`](src/rnn_lstm_sinusoid_demixing/models/fully_connected.py) in
+[`fully_connected.py`](src/rnn_lstm_sinusoid_demixing/models/fully_connected.py).
+
+**RNN / LSTM models** — selector broadcast to every timestep:
+
+$$\mathbf{x}^{seq}_{k,j,r} = \bigl[\Sigma_{\text{noisy}}(t_{k+r}),\;\mathbf{c}_j\bigr] \in \mathbb{R}^{5}, \qquad r = 0,\dots,W-1$$
+
+Full sequence input shape: $(\text{batch},\;W,\;5) = (\text{batch},\;10,\;5)$.
+Both models learn $f_\theta^{seq}: \mathbb{R}^{10 \times 5} \to \mathbb{R}^{10}$.
+
+Sequential input preparation: [`prepare_seq_input`](src/rnn_lstm_sinusoid_demixing/models/input_prep.py)
+in [`input_prep.py`](src/rnn_lstm_sinusoid_demixing/models/input_prep.py).
+Models: [`RNNModel`](src/rnn_lstm_sinusoid_demixing/models/rnn_model.py) in
+[`rnn_model.py`](src/rnn_lstm_sinusoid_demixing/models/rnn_model.py),
+[`LSTMModel`](src/rnn_lstm_sinusoid_demixing/models/lstm_model.py) in
+[`lstm_model.py`](src/rnn_lstm_sinusoid_demixing/models/lstm_model.py).
+All instantiated via [`create_model`](src/rnn_lstm_sinusoid_demixing/models/factory.py) in
+[`factory.py`](src/rnn_lstm_sinusoid_demixing/models/factory.py).
+
+---
+
+### 6. Loss Function and Evaluation Metric
+
+All models are trained and evaluated with mean squared error:
+
+$$\operatorname{MSE}(\hat{\mathbf{y}},\mathbf{y}) = \frac{1}{W}\sum_{r=0}^{W-1}\bigl(\hat{y}_r - y_r\bigr)^2$$
+
+The training objective over a mini-batch of $M$ samples is:
+
+$$\mathcal{L}(\theta) = \frac{1}{M}\sum_{m=1}^{M}\operatorname{MSE}\!\bigl(f_\theta(X_m),\;Y_m\bigr)$$
+
+All models share the same loss function, the same 80/10/10 train/val/test split, and the
+same random seed — ensuring a fair comparison.
+
+Training loss: [`mse_loss`](src/rnn_lstm_sinusoid_demixing/training/losses.py) (`nn.MSELoss`) in
+[`losses.py`](src/rnn_lstm_sinusoid_demixing/training/losses.py).
+Training loop: [`Trainer`](src/rnn_lstm_sinusoid_demixing/training/trainer.py) in
+[`trainer.py`](src/rnn_lstm_sinusoid_demixing/training/trainer.py).
+Scalar evaluation MSE: [`compute_mse`](src/rnn_lstm_sinusoid_demixing/evaluation/metrics.py) in
+[`metrics.py`](src/rnn_lstm_sinusoid_demixing/evaluation/metrics.py).
+Model ranking: [`compare_models`](src/rnn_lstm_sinusoid_demixing/evaluation/compare.py) in
+[`compare.py`](src/rnn_lstm_sinusoid_demixing/evaluation/compare.py).
+
+---
+
+### 7. Experimental Interpretation
+
+| Model | Input format | Key inductive bias |
+|-------|-------------|--------------------|
+| FC | flat $\mathbb{R}^{14}$ | global mixture window, no temporal ordering |
+| RNN | sequence $\mathbb{R}^{10 \times 5}$ | recurrent hidden state propagated across timesteps |
+| LSTM | sequence $\mathbb{R}^{10 \times 5}$ | gated memory cell for controlled long-range retention |
+
+All three models receive equivalent information and are evaluated on the same clean
+reconstruction target.  Because $W = 10$ is short, sequential models gain limited benefit
+from recurrence over a direct feed-forward path.
+
+Noise sweep $\sigma \in \{0.00, 0.01, 0.05, 0.10, 0.20\}$ characterises degradation under
+increasing corruption.  Results in [`results/mse_summary.json`](results/mse_summary.json)
+and [`results/mse_noise_sweep.json`](results/mse_noise_sweep.json).
+
+Experiment orchestration: [`run_single`](src/rnn_lstm_sinusoid_demixing/experiments/runner.py)
+and [`run_noise_sweep`](src/rnn_lstm_sinusoid_demixing/experiments/runner.py) in
+[`runner.py`](src/rnn_lstm_sinusoid_demixing/experiments/runner.py).
+Visualisation: [`plot_loss_curves`](src/rnn_lstm_sinusoid_demixing/visualization/plots.py),
+[`plot_prediction_vs_target`](src/rnn_lstm_sinusoid_demixing/visualization/plots.py),
+[`plot_mse_vs_noise`](src/rnn_lstm_sinusoid_demixing/visualization/plots.py) in
+[`plots.py`](src/rnn_lstm_sinusoid_demixing/visualization/plots.py).
+
+---
+
+### 8. Implementation Mapping Table
+
+| Mathematical object | Meaning | Implementation |
+|---|---|---|
+| $t_n = n/f_s$ | Discrete time axis | [`generate_time_axis`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py) |
+| $N = T f_s$ | Total number of samples | [`SignalConfig`](src/rnn_lstm_sinusoid_demixing/shared/config.py) · [`constants.py`](src/rnn_lstm_sinusoid_demixing/constants.py) |
+| $S_i(t)$ | Clean sinusoid | [`generate_clean_sinusoid`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py) |
+| $\varepsilon_i \sim \mathcal{N}(0,\sigma^2)$ | Independent per-component noise | [`gaussian_noise`](src/rnn_lstm_sinusoid_demixing/data/noise.py) |
+| $S_{i,\text{noisy}}(t)$ | Noisy component | [`generate_noisy_composite`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py) |
+| $\Sigma_{\text{noisy}}(t)$ | Noisy composite mixture | [`generate_noisy_composite`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py) · [`build_signals`](src/rnn_lstm_sinusoid_demixing/data/signal_generator.py) |
+| $W = 10$ | Context window length | `SignalConfig.context_window` · [`constants.py`](src/rnn_lstm_sinusoid_demixing/constants.py) |
+| $\mathbf{x}^{(\Sigma)}_k$ | Noisy mixture window | [`extract_windows`](src/rnn_lstm_sinusoid_demixing/data/dataset_builder.py) |
+| $\mathbf{c}_j$ | One-hot selector | [`make_one_hot`](src/rnn_lstm_sinusoid_demixing/data/dataset_builder.py) |
+| $\mathbf{y}_{k,j}$ | Clean target window | [`build_dataset`](src/rnn_lstm_sinusoid_demixing/data/dataset_builder.py) |
+| $X_{k,j},\;Y_{k,j}$ | Full training sample | [`build_dataset`](src/rnn_lstm_sinusoid_demixing/data/dataset_builder.py) · [`make_loader`](src/rnn_lstm_sinusoid_demixing/data/dataloader.py) |
+| $\mathbf{x}^{FC}_{k,j} \in \mathbb{R}^{14}$ | FC flat input | [`prepare_fc_input`](src/rnn_lstm_sinusoid_demixing/models/input_prep.py) |
+| $\mathbf{X}^{seq}_{k,j} \in \mathbb{R}^{10 \times 5}$ | RNN/LSTM sequence input | [`prepare_seq_input`](src/rnn_lstm_sinusoid_demixing/models/input_prep.py) |
+| $f_\theta^{FC}$ | Fully Connected model | [`FullyConnectedModel`](src/rnn_lstm_sinusoid_demixing/models/fully_connected.py) |
+| $f_\theta^{RNN}$ | Vanilla RNN model | [`RNNModel`](src/rnn_lstm_sinusoid_demixing/models/rnn_model.py) |
+| $f_\theta^{LSTM}$ | LSTM model | [`LSTMModel`](src/rnn_lstm_sinusoid_demixing/models/lstm_model.py) |
+| $\operatorname{MSE}$ | Training loss and evaluation metric | [`mse_loss`](src/rnn_lstm_sinusoid_demixing/training/losses.py) · [`compute_mse`](src/rnn_lstm_sinusoid_demixing/evaluation/metrics.py) |
 
 ---
 
@@ -251,7 +449,7 @@ src/rnn_lstm_sinusoid_demixing/
 | 06 | Models (FC, RNN, LSTM) | ✅ merged |
 | 07 | Training & evaluation loop | ✅ merged |
 | 08 | Visualization & results | ✅ merged |
-| 09 | Final submission polish | 🔜 planned |
+| 09 | Final submission polish | ✅ complete |
 
 ---
 
@@ -390,6 +588,17 @@ a denoising pre-processing step would likely reduce MSE further.
   frequency scenarios (`low_mixed`, `wide_gap`, `close_low`) are defined in
   `constants.py` but not yet benchmarked.
 - No GPU training; runs on CPU only.
+
+---
+
+## Future Improvements
+
+- **Longer context windows**: Increasing the context window beyond 10 samples would expose more signal cycles, potentially allowing RNN and LSTM models to exploit temporal dependencies and close the performance gap with FC.
+- **Additional frequency scenarios**: `constants.py` defines `low_mixed`, `wide_gap`, and `close_low` frequency sets; benchmarking all scenarios would characterise model robustness to frequency spacing.
+- **Hyperparameter search**: RNN and LSTM hidden-size, number of layers, and dropout were not tuned; a grid or random search could reduce their MSE disadvantage relative to FC.
+- **Attention-based architectures**: A lightweight Transformer (self-attention over the 10-sample window) may outperform recurrent models where the one-hot selector provides a direct frequency hint with no long-range dependency.
+- **Varying amplitudes and phases**: All components share amplitude 1.0 and zero phase; per-component amplitude and phase variation would stress-test generalisation beyond the baseline configuration.
+- **GPU support**: Enabling CUDA device selection in `TrainingConfig` would reduce wall-clock time for longer noise sweeps or larger architectures.
 
 ---
 
