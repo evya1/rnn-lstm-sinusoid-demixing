@@ -123,7 +123,7 @@ One training example is:
 
 $$X_{k,j} = \bigl(\mathbf{x}^{(\Sigma)}_k,\;\mathbf{c}_j\bigr), \qquad Y_{k,j} = \mathbf{y}_{k,j}$$
 
-With $N = 10000$, $W = 10$, and 4 components: $\text{num\_examples} = (N - W + 1) \times 4 = 39964$.
+With $N = 10000$, $W = 10$, and 4 components: `num_examples` $= (N - W + 1) \times 4 = 39964$.
 
 Window extraction: [`extract_windows`](src/rnn_lstm_sinusoid_demixing/data/dataset_builder.py).
 Selector construction: [`make_one_hot`](src/rnn_lstm_sinusoid_demixing/data/dataset_builder.py).
