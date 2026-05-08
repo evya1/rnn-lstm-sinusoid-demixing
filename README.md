@@ -451,7 +451,7 @@ dataloader splitting, MSE metric, model comparison, and all four plot functions.
 
 Integration tests cover: full pipeline from `build_signals` →
 `build_dataset` → `create_model` → forward pass; full training loop
-(Trainer.fit → compute_mse → compare_models); and `run_single` /
+(`Trainer.fit` → `compute_mse` → `compare_models`); and `run_single` /
 `run_noise_sweep` with tiny configs.
 
 ---
