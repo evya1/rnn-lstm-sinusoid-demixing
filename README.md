@@ -167,11 +167,11 @@ All instantiated via [`create_model`](src/rnn_lstm_sinusoid_demixing/models/fact
 
 All models are trained and evaluated with mean squared error:
 
-$$\operatorname{MSE}(\hat{\mathbf{y}},\mathbf{y}) = \frac{1}{W}\sum_{r=0}^{W-1}\bigl(\hat{y}_r - y_r\bigr)^2$$
+$$\mathrm{MSE}(\hat{\mathbf{y}},\mathbf{y}) = \frac{1}{W}\sum_{r=0}^{W-1}\bigl(\hat{y}_r - y_r\bigr)^2$$
 
 The training objective over a mini-batch of $M$ samples is:
 
-$$\mathcal{L}(\theta) = \frac{1}{M}\sum_{m=1}^{M}\operatorname{MSE}\!\bigl(f_\theta(X_m),\;Y_m\bigr)$$
+$$\mathcal{L}(\theta) = \frac{1}{M}\sum_{m=1}^{M}\mathrm{MSE}\bigl(f_\theta(X_m),\;Y_m\bigr)$$
 
 All models share the same loss function, the same 80/10/10 train/val/test split, and the
 same random seed — ensuring a fair comparison.
@@ -233,7 +233,7 @@ Visualisation: [`plot_loss_curves`](src/rnn_lstm_sinusoid_demixing/visualization
 | $f_\theta^{FC}$ | Fully Connected model | [`FullyConnectedModel`](src/rnn_lstm_sinusoid_demixing/models/fully_connected.py) |
 | $f_\theta^{RNN}$ | Vanilla RNN model | [`RNNModel`](src/rnn_lstm_sinusoid_demixing/models/rnn_model.py) |
 | $f_\theta^{LSTM}$ | LSTM model | [`LSTMModel`](src/rnn_lstm_sinusoid_demixing/models/lstm_model.py) |
-| $\operatorname{MSE}$ | Training loss and evaluation metric | [`mse_loss`](src/rnn_lstm_sinusoid_demixing/training/losses.py) · [`compute_mse`](src/rnn_lstm_sinusoid_demixing/evaluation/metrics.py) |
+| $\mathrm{MSE}$ | Training loss and evaluation metric | [`mse_loss`](src/rnn_lstm_sinusoid_demixing/training/losses.py) · [`compute_mse`](src/rnn_lstm_sinusoid_demixing/evaluation/metrics.py) |
 
 ---
 
