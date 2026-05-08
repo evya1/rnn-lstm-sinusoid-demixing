@@ -437,22 +437,6 @@ src/rnn_lstm_sinusoid_demixing/
 
 ---
 
-## Development Status
-
-| Phase | Description | Status |
-|-------|-------------|--------|
-| 01 | Repository setup | ✅ merged |
-| 02 | Documentation (PRD, PLAN, TODO) | ✅ merged |
-| 03 | Project skeleton | ✅ merged |
-| 04 | Data generation | ✅ merged |
-| 05 | Dataset builder | ✅ merged |
-| 06 | Models (FC, RNN, LSTM) | ✅ merged |
-| 07 | Training & evaluation loop | ✅ merged |
-| 08 | Visualization & results | ✅ merged |
-| 09 | Final submission polish | ✅ complete |
-
----
-
 ## Testing
 
 ```
